@@ -30,46 +30,54 @@ class OrderItem {
   }
 }
 
-class AppOrder {
+class OrderModel {
   final String id;
-  final String userId;
+  final String clientId;
+  final String? riderId;
   final DateTime date;
-  final String status;
+  final String status; // pendiente, en_cocina, en_lote, en_ruta, entregado
   final double total;
   final List<OrderItem> items;
+  final String zone;
 
-  AppOrder({
+  OrderModel({
     required this.id,
-    required this.userId,
+    required this.clientId,
+    this.riderId,
     required this.date,
     required this.status,
     required this.total,
     required this.items,
+    required this.zone,
   });
 
-  factory AppOrder.fromMap(Map<String, dynamic> data, String documentId) {
+  factory OrderModel.fromMap(Map<String, dynamic> data, String documentId) {
     var itemsData = data['items'] as List<dynamic>? ?? [];
     List<OrderItem> items = itemsData
         .map((item) => OrderItem.fromMap(item as Map<String, dynamic>))
         .toList();
 
-    return AppOrder(
+    return OrderModel(
       id: documentId,
-      userId: data['userId'] ?? '',
+      clientId: data['clientId'] ?? '',
+      riderId: data['riderId'],
       date: data['date'] != null ? data['date'].toDate() : DateTime.now(),
-      status: data['status'] ?? 'pending',
+      status: data['status'] ?? 'pendiente',
       total: (data['total'] ?? 0.0).toDouble(),
       items: items,
+      zone: data['zone'] ?? '',
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'userId': userId,
+      'clientId': clientId,
+      if (riderId != null) 'riderId': riderId,
       'date': date,
       'status': status,
       'total': total,
       'items': items.map((item) => item.toMap()).toList(),
+      'zone': zone,
     };
   }
 }
